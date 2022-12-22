@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour
     private bool groundedPlayer;
     public Vector3 playerVelocity;
    public float speed = 0f;
+   private int score = 0;
    
     void Start()
     {
@@ -27,6 +28,17 @@ public class PlayerController : MonoBehaviour
         if (move != Vector3.zero)
         {
             gameObject.transform.forward = move;
+        }
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("Pickup"))
+        {
+            other.gameObject.SetActive(false);
+            score++;
+            Debug.Log("Score: " + score.ToString());
+
         }
     }
 }
