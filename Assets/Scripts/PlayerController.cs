@@ -1,44 +1,71 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+
 
 public class PlayerController : MonoBehaviour
 {
-    private CharacterController control;
-    private bool groundedPlayer;
-    public Vector3 playerVelocity;
-   public float speed = 0f;
-   private int score = 0;
-   
-    void Start()
+    public float speed = 1f;
+    public Rigidbody rb;
+    private int score = 0;
+    public int health = 5;
+    
+
+    
+    void OnTriggerEnter(Collider other)
     {
-        control = gameObject.AddComponent<CharacterController>();
+        if(other.tag == "Pickup")
+        {
+            score++;
+            Debug.Log($"Score: {score}");
+            Destroy(other.gameObject);
+        }
+        
+        if(other.tag == "Trap")
+        {
+            health--;
+            Debug.Log($"Health: {health}");
+        }
+
+        if(other.tag == "Goal")
+        {
+            Debug.Log("You win!");
+        }
     }
+    
+    
+    // Update is called once per frame
+    void FixedUpdate()
+    {
+        if(Input.GetKey("w") || Input.GetKey("up"))
+        {
+            rb.AddForce(0, 0, speed * Time.deltaTime);
+        }
+
+        if(Input.GetKey("s") || Input.GetKey("down"))
+        {
+            rb.AddForce(0, 0, -speed * Time.deltaTime);
+        }
+
+        if(Input.GetKey("a") || Input.GetKey("left"))
+        {
+            rb.AddForce(-speed * Time.deltaTime, 0, 0);
+        }
+
+        if(Input.GetKey("d") || Input.GetKey("right"))
+        {
+            rb.AddForce(speed * Time.deltaTime,0,0);
+        }
+    }
+
 
     void Update()
     {
-        groundedPlayer = control.isGrounded;
-        if (groundedPlayer && playerVelocity.y < 0)
+        if(health == 0)
         {
-            playerVelocity.y = 0f;
-        }
-        Vector3 move = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
-        control.Move(move * Time.deltaTime * speed);
-
-        if (move != Vector3.zero)
-        {
-            gameObject.transform.forward = move;
-        }
-    }
-
-    void OnTriggerEnter(Collider other)
-    {
-        if (other.gameObject.CompareTag("Pickup"))
-        {
-            other.gameObject.SetActive(false);
-            score++;
-            Debug.Log("Score: " + score.ToString());
-
+            Debug.Log("Game Over!");
+            SceneManager.LoadScene(0, LoadSceneMode.Single);
         }
     }
 }
